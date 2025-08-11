@@ -1,47 +1,32 @@
 import React, { useState } from "react";
 
 export default function AnalyzeTest() {
-  const [input, setInput] = useState(`{
-    "licenses": [
-      { "Leverantör":"Microsoft 365","Kategori":"Programvara","Antal licenser":15,"Aktiva användare":10,"Pris per licens (SEK/mån)":120 },
-      { "Leverantör":"Slack","Kategori":"Kommunikation","Antal licenser":20,"Aktiva användare":15,"Pris per licens (SEK/mån)":85 }
-    ],
-    "projects": [
-      { "Projekt":"Projekt Alfa","Uppgift":"Rapportskrivning","Tidsåtgång (timmar)":50 }
-    ]
-  }`);
-  const [result, setResult] = useState(null);
+  const [result, setResult] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleAnalyze = async () => {
+  const runAnalysis = async () => {
+    setLoading(true);
+    setResult("");
     try {
-      const res = await fetch("/api/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: input,
-      });
+      const res = await fetch("/api/analyze");
       const data = await res.json();
-      setResult(data);
+      setResult(JSON.stringify(data, null, 2));
     } catch (err) {
-      console.error(err);
-      alert("Fel vid anrop");
+      setResult("Fel vid analys: " + err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div style={{ padding: 20 }}>
-      <h2>Testa AI-analysen</h2>
-      <textarea
-        rows={12}
-        cols={80}
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-      />
-      <br />
-      <button onClick={handleAnalyze}>Analysera</button>
-
+    <div style={{ padding: "20px", border: "1px solid #ccc", marginTop: "20px" }}>
+      <h3>Testa AI-analys</h3>
+      <button onClick={runAnalysis} disabled={loading}>
+        {loading ? "Analyserar..." : "Kör analys"}
+      </button>
       {result && (
-        <pre style={{ background: "#f0f0f0", padding: 10 }}>
-          {JSON.stringify(result, null, 2)}
+        <pre style={{ background: "#f4f4f4", padding: "10px", marginTop: "10px" }}>
+          {result}
         </pre>
       )}
     </div>
