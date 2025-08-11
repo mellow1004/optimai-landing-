@@ -5,7 +5,7 @@ function Contact() {
     <section id="contact" className="py-12 px-4 max-w-2xl mx-auto">
       <h2 className="text-3xl font-bold mb-6">Kontakta oss</h2>
       <form
-        action="https://formspree.io/f/xqalwjoy"
+        action="https://formspree.io/f/xqalwjoy"  // ← Här är länken
         method="POST"
         className="space-y-4"
       >
