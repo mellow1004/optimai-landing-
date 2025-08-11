@@ -14,11 +14,8 @@ export default function App() {
       <PilotOffer />
       <Pricing />
       <FAQ />
-
-      {/* ⬇️ Nytt: testkomponenten för AI-analysen visas här */}
-      <AnalyzeTest />
-
       <Contact />
+      <AnalyzeTest /> {/* Lagt till AI-testet här */}
       <Footer />
 
       {!cookieOk && (
@@ -347,3 +344,14 @@ function Footer() {
     </footer>
   );
 }
+function Navbar() { /* ... */ }
+function Hero() { /* ... */ }
+function SocialProof() { /* ... */ }
+function HowItWorks() { /* ... */ }
+function Benefits() { /* ... */ }
+function Integrations() { /* ... */ }
+function PilotOffer() { /* ... */ }
+function Pricing() { /* ... */ }
+function FAQ() { /* ... */ }
+function Contact() { /* ... */ }
+function Footer() { /* ... */ }
