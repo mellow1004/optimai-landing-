@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import AnalyzeTest from "./AnalyzeTest";
+
 export default function App() {
   const [cookieOk, setCookieOk] = useState(false);
   return (
@@ -14,7 +15,10 @@ export default function App() {
       <Pricing />
       <FAQ />
       <Contact />
-      <AnalyzeTest /> {/* Lagt till AI-testet här */}
+
+      {/* AI-bottens testsektion – låter prospekt köra analysen live */}
+      <AnalyzeTest />
+
       <Footer />
 
       {!cookieOk && (
@@ -34,6 +38,8 @@ export default function App() {
     </div>
   );
 }
+
+/* ------------------- Sektioner/komponenter ------------------- */
 
 function Navbar() {
   return (
@@ -277,6 +283,8 @@ function Contact() {
           Fyll i formuläret så återkommer vi med kalenderlänk. Alternativt: maila
           <a href="mailto:hello@dindoman.se" className="underline"> hello@dindoman.se</a>.
         </p>
+
+        {/* Om du använder Formspree: lägg in din action-URL här */}
         <form method="POST" action="ACTION_URL_REPLACE_ME" className="mt-6 grid grid-cols-1 gap-4">
           <input name="namn" required placeholder="Ditt namn" className="px-4 py-3 rounded-2xl border border-slate-300 focus:outline-none" />
           <input name="email" type="email" required placeholder="E-post" className="px-4 py-3 rounded-2xl border border-slate-300 focus:outline-none" />
@@ -343,14 +351,3 @@ function Footer() {
     </footer>
   );
 }
-function Navbar() { /* ... */ }
-function Hero() { /* ... */ }
-function SocialProof() { /* ... */ }
-function HowItWorks() { /* ... */ }
-function Benefits() { /* ... */ }
-function Integrations() { /* ... */ }
-function PilotOffer() { /* ... */ }
-function Pricing() { /* ... */ }
-function FAQ() { /* ... */ }
-function Contact() { /* ... */ }
-function Footer() { /* ... */ }
