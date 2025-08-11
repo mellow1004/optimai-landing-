@@ -49,7 +49,7 @@ function Navbar() {
           <a href="#faq" className="hover:text-slate-900">FAQ</a>
         </nav>
         <div className="flex items-center gap-3">
-          <a href="#contact" className="px-4 py-2 rounded-xl bg-slate-900 text-white text-sm hover:opacity-90">Boka 15-min demo</a>
+          <a href="https://calendly.com/melker-lowenbrand-lmo9/30min" className="px-4 py-2 rounded-xl bg-slate-900 text-white text-sm hover:opacity-90">Boka 15-min demo</a>
         </div>
       </div>
     </header>
