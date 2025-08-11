@@ -1,8 +1,10 @@
-export default function App() {
+function App() {
   return (
-    <div style={{ padding: 24, fontFamily: 'system-ui, sans-serif' }}>
+    <div style={{ padding: '24px', fontFamily: 'system-ui, sans-serif' }}>
       <h1>OptimAI</h1>
-      <p>Det funkar! Nu kan vi lägga tillbaka hela sidan.</p>
+      <p>Det här är en testversion för att säkerställa att bygget fungerar.</p>
     </div>
   );
 }
+
+export default App;
