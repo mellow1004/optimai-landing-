@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import AnalyzeTest from "./AnalyzeTest";
 
 export default function App() {
   const [cookieOk, setCookieOk] = useState(false);
@@ -13,6 +14,10 @@ export default function App() {
       <PilotOffer />
       <Pricing />
       <FAQ />
+
+      {/* ⬇️ Nytt: testkomponenten för AI-analysen visas här */}
+      <AnalyzeTest />
+
       <Contact />
       <Footer />
 
