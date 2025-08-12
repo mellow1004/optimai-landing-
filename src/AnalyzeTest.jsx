@@ -1,3 +1,4 @@
+import * as XLSX from "xlsx";
 import React, { useMemo, useState } from "react";
 
 const fmt = new Intl.NumberFormat("sv-SE");
