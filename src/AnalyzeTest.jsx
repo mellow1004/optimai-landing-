@@ -2,6 +2,40 @@ import * as XLSX from "xlsx";
 import React, { useMemo, useState } from "react";
 
 const fmt = new Intl.NumberFormat("sv-SE");
+{/* Filuppladdning */}
+<div className="mt-4">
+  <label className="block text-sm font-medium text-slate-700 mb-1">
+    Ladda upp Excel med licenser
+  </label>
+  <input
+    type="file"
+    accept=".xlsx,.xls"
+    onChange={(e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        const data = new Uint8Array(evt.target.result);
+        const workbook = XLSX.read(data, { type: "array" });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const json = XLSX.utils.sheet_to_json(sheet);
+        
+        // Här sätter vi filens data till licenserna
+        setLicenses(
+          json.map((row) => ({
+            leverantor: row["Leverantör"] || "",
+            licenser: row["Antal licenser"] || 0,
+            aktiva: row["Aktiva användare"] || 0,
+            pris: row["Pris per licens (SEK/mån)"] || 0,
+          }))
+        );
+      };
+      reader.readAsArrayBuffer(file);
+    }}
+    className="px-3 py-2 border rounded-xl"
+  />
+</div>
 
 export default function AnalyzeTest() {
   // Enkel startdata
