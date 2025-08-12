@@ -3,28 +3,26 @@ import React, { useMemo, useState } from "react";
 const fmt = new Intl.NumberFormat("sv-SE");
 
 export default function AnalyzeTest() {
-  // Enkel formulärdata för prospektet
+  // Enkel startdata
   const [licenses, setLicenses] = useState([
     { leverantor: "Microsoft 365", licenser: 15, aktiva: 10, pris: 120 },
   ]);
-  const [projects, setProjects] = useState([
-    { uppgift: "Rapportskrivning", timmar: 10 },
-  ]);
+  const [projects, setProjects] = useState([{ uppgift: "Rapportskrivning", timmar: 10 }]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
   const [result, setResult] = useState(null);
 
-  // Admin-läge: visa avancerat om URL har ?admin=1
+  // Admin-läge: öppna sidan med ?admin=1 för att se rå-JSON-fält
   const admin = useMemo(
     () => typeof window !== "undefined" && window.location.search.includes("admin=1"),
     []
   );
   const [raw, setRaw] = useState(""); // endast admin
 
+  // Helpers
   const addLicense = () =>
     setLicenses((l) => [...l, { leverantor: "", licenser: 0, aktiva: 0, pris: 0 }]);
-  const addProject = () =>
-    setProjects((p) => [...p, { uppgift: "", timmar: 0 }]);
+  const addProject = () => setProjects((p) => [...p, { uppgift: "", timmar: 0 }]);
 
   const updateLicense = (i, key, val) =>
     setLicenses((l) => l.map((r, idx) => (idx === i ? { ...r, [key]: val } : r)));
@@ -51,19 +49,19 @@ export default function AnalyzeTest() {
     setErr("");
     setResult(null);
     try {
-      // Bygg payload i samma format som backend-exemplet förväntar sig
+      // Bygg payload i samma format som backend väntar sig
       const payload = {
         licenses: licenses.map((r) => ({
-          Leverantör: r.leverantor || "Okänt",
+          Leverantör: r.leverantor?.trim() || "Okänt",
           Kategori: "Programvara",
-          "Antal licenser": Number(r.licenser || 0),
-          "Aktiva användare": Number(r.aktiva || 0),
-          "Pris per licens (SEK/mån)": Number(r.pris || 0),
+          "Antal licenser": Math.max(0, Number(r.licenser || 0)),
+          "Aktiva användare": Math.max(0, Number(r.aktiva || 0)),
+          "Pris per licens (SEK/mån)": Math.max(0, Number(r.pris || 0)),
         })),
         projects: projects.map((r, i) => ({
           Projekt: `Projekt ${i + 1}`,
-          Uppgift: r.uppgift || "Uppgift",
-          "Tidsåtgång (timmar)": Number(r.timmar || 0),
+          Uppgift: r.uppgift?.trim() || "Uppgift",
+          "Tidsåtgång (timmar)": Math.max(0, Number(r.timmar || 0)),
         })),
       };
 
@@ -103,77 +101,144 @@ export default function AnalyzeTest() {
     <section id="analyze" className="mx-auto max-w-5xl px-4 py-12">
       <h2 className="text-3xl font-bold">Testa AI-analysen</h2>
       <p className="text-slate-600 mt-1">
-        Fyll i era licenser och ungefärlig tidsåtgång – klicka <b>Analysera</b>.
+        Fyll i era licenser och ungefärlig tidsåtgång – klicka <b>Analysera</b>. Vi räknar ut potential i
+        <b> SEK/år</b> och <b>timmar/mån</b> och visar de bäst prioriterade åtgärderna.
       </p>
 
-      {/* Licenser */}
-      <div className="mt-6">
-        <h3 className="font-semibold">Licenser</h3>
-        <div className="mt-2 grid gap-3">
+      {/* -------------------- Licenser -------------------- */}
+      <div className="mt-8">
+        <h3 className="text-xl font-semibold">Licenser</h3>
+        <p className="text-slate-600 text-sm mt-1">
+          <b>Antal licenser</b> = totala köpta platser. <b>Aktiva användare</b> = de som använder verktyget minst 1 gång/månad.
+          <b> Pris per licens</b> i SEK per månad.
+        </p>
+
+        {/* Kolumnrubriker */}
+        <div className="grid md:grid-cols-4 gap-3 mt-4 text-xs text-slate-500">
+          <div>Leverantör</div>
+          <div>Antal licenser (st)</div>
+          <div>Aktiva användare (st)</div>
+          <div>Pris per licens (SEK/mån)</div>
+        </div>
+
+        {/* Rader */}
+        <div className="mt-1 grid gap-3">
           {licenses.map((row, i) => (
             <div key={i} className="grid md:grid-cols-4 gap-3">
-              <input
-                className="px-3 py-2 border rounded-xl"
-                placeholder="Leverantör (t.ex. Microsoft 365)"
-                value={row.leverantor}
-                onChange={(e) => updateLicense(i, "leverantor", e.target.value)}
-              />
-              <input
-                className="px-3 py-2 border rounded-xl"
-                type="number"
-                placeholder="Antal licenser"
-                value={row.licenser}
-                onChange={(e) => updateLicense(i, "licenser", e.target.value)}
-              />
-              <input
-                className="px-3 py-2 border rounded-xl"
-                type="number"
-                placeholder="Aktiva användare"
-                value={row.aktiva}
-                onChange={(e) => updateLicense(i, "aktiva", e.target.value)}
-              />
-              <input
-                className="px-3 py-2 border rounded-xl"
-                type="number"
-                placeholder="Pris per licens (SEK/mån)"
-                value={row.pris}
-                onChange={(e) => updateLicense(i, "pris", e.target.value)}
-              />
+              <div>
+                <input
+                  className="px-3 py-2 border rounded-xl w-full"
+                  placeholder="ex. Microsoft 365"
+                  value={row.leverantor}
+                  onChange={(e) => updateLicense(i, "leverantor", e.target.value)}
+                  aria-label="Leverantör"
+                />
+                <div className="text-xs text-slate-500 mt-1">Exempel: Slack, Zoom, Visma</div>
+              </div>
+
+              <div>
+                <input
+                  className="px-3 py-2 border rounded-xl w-full"
+                  type="number"
+                  min="0"
+                  placeholder="ex. 20"
+                  value={row.licenser}
+                  onChange={(e) => updateLicense(i, "licenser", Math.max(0, Number(e.target.value || 0)))}
+                  aria-label="Antal licenser"
+                />
+                <div className="text-xs text-slate-500 mt-1">Totalt köpta platser</div>
+              </div>
+
+              <div>
+                <input
+                  className="px-3 py-2 border rounded-xl w-full"
+                  type="number"
+                  min="0"
+                  placeholder="ex. 14"
+                  value={row.aktiva}
+                  onChange={(e) => updateLicense(i, "aktiva", Math.max(0, Number(e.target.value || 0)))}
+                  aria-label="Aktiva användare"
+                />
+                <div className="text-xs text-slate-500 mt-1">Faktiskt använda platser</div>
+              </div>
+
+              <div>
+                <input
+                  className="px-3 py-2 border rounded-xl w-full"
+                  type="number"
+                  min="0"
+                  placeholder="ex. 120"
+                  value={row.pris}
+                  onChange={(e) => updateLicense(i, "pris", Math.max(0, Number(e.target.value || 0)))}
+                  aria-label="Pris per licens i SEK per månad"
+                />
+                <div className="text-xs text-slate-500 mt-1">SEK per licens och månad</div>
+              </div>
             </div>
           ))}
-          <button onClick={addLicense} className="w-max px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200">
+
+          <button
+            onClick={addLicense}
+            className="w-max px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200"
+          >
             + Lägg till licens
           </button>
         </div>
       </div>
 
-      {/* Tidsåtgång */}
-      <div className="mt-8">
-        <h3 className="font-semibold">Tidsåtgång</h3>
-        <div className="mt-2 grid gap-3">
+      {/* -------------------- Tidsåtgång -------------------- */}
+      <div className="mt-10">
+        <h3 className="text-xl font-semibold">Tidsåtgång</h3>
+        <p className="text-slate-600 text-sm mt-1">
+          Återkommande uppgifter ni lägger tid på. <b>Timmar/mån</b> = ungefärligt snitt per månad.
+        </p>
+
+        {/* Kolumnrubriker */}
+        <div className="grid md:grid-cols-2 gap-3 mt-4 text-xs text-slate-500">
+          <div>Uppgift</div>
+          <div>Timmar/mån</div>
+        </div>
+
+        {/* Rader */}
+        <div className="mt-1 grid gap-3">
           {projects.map((row, i) => (
             <div key={i} className="grid md:grid-cols-2 gap-3">
-              <input
-                className="px-3 py-2 border rounded-xl"
-                placeholder="Uppgift (t.ex. Rapportskrivning)"
-                value={row.uppgift}
-                onChange={(e) => updateProject(i, "uppgift", e.target.value)}
-              />
-              <input
-                className="px-3 py-2 border rounded-xl"
-                type="number"
-                placeholder="Timmar per månad"
-                value={row.timmar}
-                onChange={(e) => updateProject(i, "timmar", e.target.value)}
-              />
+              <div>
+                <input
+                  className="px-3 py-2 border rounded-xl w-full"
+                  placeholder="ex. Rapportskrivning"
+                  value={row.uppgift}
+                  onChange={(e) => updateProject(i, "uppgift", e.target.value)}
+                  aria-label="Uppgift"
+                />
+                <div className="text-xs text-slate-500 mt-1">Ex: månadsrapport, kundsupport, onboarding</div>
+              </div>
+
+              <div>
+                <input
+                  className="px-3 py-2 border rounded-xl w-full"
+                  type="number"
+                  min="0"
+                  placeholder="ex. 10"
+                  value={row.timmar}
+                  onChange={(e) => updateProject(i, "timmar", Math.max(0, Number(e.target.value || 0)))}
+                  aria-label="Timmar per månad"
+                />
+                <div className="text-xs text-slate-500 mt-1">Ungefärliga timmar per månad</div>
+              </div>
             </div>
           ))}
-          <button onClick={addProject} className="w-max px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200">
+
+          <button
+            onClick={addProject}
+            className="w-max px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200"
+          >
             + Lägg till uppgift
           </button>
         </div>
       </div>
 
+      {/* -------------------- Actions -------------------- */}
       <div className="mt-6 flex gap-3">
         <button
           onClick={handleAnalyze}
@@ -183,7 +248,6 @@ export default function AnalyzeTest() {
           {loading ? "Analyserar…" : "Analysera"}
         </button>
 
-        {/* Admin-knappar (syns endast med ?admin=1) */}
         {admin && (
           <>
             <button onClick={loadExample} className="px-4 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200">
@@ -211,7 +275,7 @@ export default function AnalyzeTest() {
         <div className="mt-4 p-3 rounded-xl border border-red-200 bg-red-50 text-red-700">{err}</div>
       )}
 
-      {/* Resultat – endast snyggt UI */}
+      {/* -------------------- Resultat -------------------- */}
       {result && (
         <div className="mt-8 grid md:grid-cols-2 gap-6">
           <div className="rounded-2xl border border-slate-200 p-4">
@@ -233,9 +297,24 @@ export default function AnalyzeTest() {
                 </li>
               ))}
             </ul>
+
+            {/* CTA efter resultat */}
+            <div className="mt-4">
+              <a
+                href="https://calendly.com/melker-lowenbrand-lmo9/30min"
+                className="inline-block px-5 py-3 rounded-2xl bg-slate-900 text-white hover:opacity-90"
+              >
+                Boka genomgång av resultat
+              </a>
+            </div>
           </div>
         </div>
       )}
+
+      {/* Integritetssnutt */}
+      <p className="mt-8 text-xs text-slate-500">
+        Vi sparar inte innehållet du matar in i detta demotest. För pilot/produktion används säkra anslutningar och minimerad datamängd.
+      </p>
     </section>
   );
 }
